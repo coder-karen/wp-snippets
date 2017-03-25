@@ -93,7 +93,7 @@ function ka_event_query( $query ) {
 		//Filtering out posts that have checkbox checked (therefore marked as true)
 		$meta_query = array(
 			array(
-				'key' => 'event_current',
+				'key' => 'event_current', //key as created in advanced custom field
 				'value' => true,
 				'compare' => 'BOOLEAN'
 			)
