@@ -5,6 +5,7 @@ Here is a collection of code snippets that I use and have found helpful.
 * [Custom Page Titles](#custom-page-titles)
 * [Custom Page Titles with Yoast](#custom-page-titles-with-yoast)
 * [Customising the Custom Post Type Query](#customising-the-custom-post-type-query)
+* [Enabling Shortcodes within the Custom HTML Widget](#enabling-shortcodes-within-the-custom-html-widget)
 
 ### Custom Page Titles
 Assuming you have added theme support for title-tag.
@@ -85,7 +86,7 @@ add_filter( 'wpseo_title', 'custom_theme_titles_yoast', PHP_INT_MAX );
 
 
 ### Customising the Custom Post Type Query
-Working with pre_get_posts to modify custom post type (events) output on a page (only displaying posts that have a checkbox checked (using the advanced custom fields plugin) and only showing a maximum of 3 posts per page)
+Working with pre_get_posts to modify custom post type (events) output on a page (only displaying posts that have a checkbox checked (using the advanced custom fields plugin) and only showing a maximum of 3 posts per page).
 
 ```php
 function ka_event_query( $query ) {
@@ -105,5 +106,14 @@ function ka_event_query( $query ) {
 }
 
 add_action( 'pre_get_posts', 'ka_event_query' );
+
+```
+
+
+### Enabling Shortcodes within the Custom HTML Widget
+Enabling shortcodes within the Text Widget does not transfer over to the newer Custom HTML Widget. This allows shortcodes in the Custom HTML Widget.
+
+```php
+add_filter('widget_custom_html_content','do_shortcode');
 
 ```
