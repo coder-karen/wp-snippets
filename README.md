@@ -132,6 +132,12 @@ function ka_comment_moderation_recipients( $emails, $comment_id ) {
     }
 
     $post = get_post( $comment->comment_post_ID );
+
+    // Refine if you only want comments from a custom post type (or remove this section)
+    if($post->post_type != "custom_post_type") {
+        return $emails;
+    }
+
     $user = get_user_by( 'id', $post->post_author );
  
     // Return the post author email if the author can modify, as well as a custom email
