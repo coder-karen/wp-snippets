@@ -6,6 +6,7 @@ Here is a collection of code snippets that I use and have found helpful.
 * [Custom Page Titles with Yoast](#custom-page-titles-with-yoast)
 * [Customising the Custom Post Type Query](#customising-the-custom-post-type-query)
 * [Enabling Shortcodes within the Custom HTML Widget](#enabling-shortcodes-within-the-custom-html-widget)
+* [Send Post Comments to Custom Email Addresses](#send-post-comments-to-custom-email-addresses)
 
 ### Custom Page Titles
 Assuming you have added theme support for title-tag.
@@ -115,5 +116,38 @@ Enabling shortcodes within the Text Widget does not transfer over to the newer C
 
 ```php
 add_filter('widget_custom_html_content','do_shortcode');
+
+```
+
+
+### Send Post Comments to Custom Email Addresses
+Here is a solution to make sure all post comments go to the post author (allowing for custom post-types as well) and a second specified email address. Alternatively just leave the specified email address as the only option.
+
+```php
+function ka_comment_moderation_recipients( $emails, $comment_id ) {
+    $comment = get_comment( $comment_id );
+
+    if(empty($comment)) {
+        return $emails;
+    }
+
+    $post = get_post( $comment->comment_post_ID );
+    $user = get_user_by( 'id', $post->post_author );
+ 
+    // Return the post author email if the author can modify, as well as a custom email
+    if ( user_can( $user->ID, 'edit_published_posts' ) && ! empty( $user->user_email ) ) {
+        $emails = array( $user->user_email, 'info@example.com');
+    }
+
+    //Else return just the custom email
+    else {
+        $emails = array('info@example.com');
+    }
+ 
+    return $emails;
+}
+
+add_filter( 'comment_moderation_recipients', 'ka_comment_moderation_recipients', 11, 2 );
+add_filter( 'comment_notification_recipients', 'ka_comment_moderation_recipients', 11, 2 );
 
 ```
