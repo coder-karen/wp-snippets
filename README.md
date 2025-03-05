@@ -2,11 +2,67 @@
 
 Here is a collection of code snippets that I use and have found helpful.
 
+* [Add a pattern attribute to a Jetpack contact form field](#add-a-pattern-attribute-to-a-jetpack-contact-form-field)
+* [Add a max character limit to a Jetpack contact form field](#add-a-max-character-limit-to-a-jetpack-contact-form-field)
 * [Custom Page Titles](#custom-page-titles)
 * [Custom Page Titles with Yoast](#custom-page-titles-with-yoast)
 * [Customising the Custom Post Type Query](#customising-the-custom-post-type-query)
 * [Enabling Shortcodes within the Custom HTML Widget](#enabling-shortcodes-within-the-custom-html-widget)
 * [Send Post Comments to Custom Email Addresses](#send-post-comments-to-custom-email-addresses)
+
+
+### Add a pattern attribute to a Jetpack contact form field
+
+Restricting what URLs site visitors can enter into a Jetpack form URL field - in this case only YouTube URLs.
+
+```php
+add_filter( 'grunion_contact_form_field_html', function( $rendered_field, $field_label, $id ) {
+    if ( $field_label === 'Website' ) { // Update this value if your URL field has a different name.
+        $rendered_field = preg_replace(
+            '/pattern="([^"]*)"/',
+            'pattern="^https:\/\/(?:(?:www\.)?youtube\.com|youtu\.be)\/.*$"',
+            $rendered_field
+        );
+        // Update the custom validity message
+        $rendered_field = preg_replace(
+            '/setCustomValidity\\(&quot;[^&]*&quot;\\)/',
+            'setCustomValidity(&quot;Please enter a valid YouTube URL&quot;)',
+            $rendered_field
+        );
+    }
+    return $rendered_field;
+}, 10, 3 )
+```
+
+### Add a max character limit to a Jetpack contact form field
+
+Add a max character limit of 500 to the messages field, along with a span element explaining the limit.
+
+```php
+add_filter( 'grunion_contact_form_field_html', function( $rendered_field, $field_label, $id ) {
+    if ( $field_label === 'Message' && strpos( $rendered_field, '<textarea' ) !== false ) {
+        $rendered_field = preg_replace(
+            '/<textarea/',
+            '<textarea maxlength="500"',
+            $rendered_field,
+            1
+        );
+
+        $limit_text = sprintf(
+            /* translators: %d: maximum number of characters allowed */
+            esc_html__( 'Maximum %d characters allowed', 'your-text-domain' ),
+            500
+        );
+        
+        $rendered_field = str_replace(
+            '</div>',
+            '<span id="message-limit-' . esc_attr($id) . '" class="message-limit-text" style="display: block; margin-top: 4px; font-size: 0.8em; color: #666;">' . $limit_text . '</span></div>',
+            $rendered_field
+        );
+    }
+    return $rendered_field;
+}, 10, 3 );
+```
 
 ### Custom Page Titles
 Assuming you have added theme support for title-tag.
